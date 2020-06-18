@@ -426,7 +426,7 @@ static void dy_forwardInvocation_center(id self, SEL _cmd, NSInvocation *anInvoc
 }];
 ```
 
-### 五、方法调用前后插入自定义代码
+### 四、方法调用前后插入自定义代码
 我们可以在回调 block 中做一些自定义调用，等这些完成后再调用`[originalInvocation invoke]` 。例如在 `className` 调用前调用 `customMethod`方法
 
 ```objc
