@@ -476,7 +476,7 @@ static void dy_forwardInvocation_center(id self, SEL _cmd, NSInvocation *anInvoc
 
 ```
 
-上面简单的阐述了如何通过字符串实现调用OC方法，如果要实现可以调用任意OC方法，还需要继续完善上面的解析逻辑，但其中核心点都是通过构建 `NSInvocation`。这里算是抛砖引玉吧。
+上面简单的阐述了如何通过字符串方式调用OC方法，如果要实现可以调用任意OC方法，还需要继续完善上面的解析逻辑，但其中核心点都是通过构建 `NSInvocation`。这里算是抛砖引玉吧。
 
 > Tip：很多时候可能需要调用多个方法，并且有些方法的返回值是后面的方法的参数值。例如：`self.backgroundColor = [UIColor redColor];`，这就需要我们现提前创建好 `redColor`局部变量，并且使用 key-value 方式保存下来。这样我们就可以在回调 block 中通过对应 key 获取到`redColor`。
 
