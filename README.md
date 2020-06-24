@@ -423,6 +423,11 @@ static void dy_forwardInvocation_center(id self, SEL _cmd, NSInvocation *anInvoc
     }];
     
     [originalInvocation invoke];
+    
+    id returnValue = [hookMap objectForKey:@"returnValue"];
+    if (returnValue) {
+	[originalInvocation setReturnValue:&returnValue];
+    }
 }];
 ```
 
@@ -472,6 +477,11 @@ static void dy_forwardInvocation_center(id self, SEL _cmd, NSInvocation *anInvoc
     }];
     
     [originalInvocation invoke];
+    
+    id returnValue = [hookMap objectForKey:@"returnValue"];
+    if (returnValue) {
+	[originalInvocation setReturnValue:&returnValue];
+    }
 }];
 
 ```
@@ -658,11 +668,11 @@ value = (__bridge id)result;
 
 ```
 
-使用**`Memory Graph`**查看对象内存时会发现 `MyClassA` 和 `MyClassB` 都被标记为内存泄漏了⚠️
+使用`Memory Graph`查看对象内存时会发现 `MyClassA` 和 `MyClassB` 都被标记为内存泄漏了⚠️
 
 **原因分析：**
 
-1. ARC 机制中，当调用 `alloc/new/copy/mutableCopy` 方法返回的对象是直接持有的。其引用计数为**`1`**，并且不会自动调用 `autorelease`
+1. ARC 机制中，当调用 `alloc/new/copy/mutableCopy` 方法返回的对象是直接持有的。其引用计数为`1`，并且不会自动调用 `autorelease`
 2. 常规的方法返回值 ARC 会在 return 后自动调用 `autorelease`，所以不会发生内存泄漏
 3. 使用`NSInvocation`或`performSelector:`调用`alloc/new/copy/mutableCopy`方法时，ARC 并不会自动调用`release`，所以导致内存泄漏
 
