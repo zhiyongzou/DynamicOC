@@ -390,7 +390,7 @@ static void dy_forwardInvocation_center(id self, SEL _cmd, NSInvocation *anInvoc
     NSLog(@"Fix me here!");
     
     [parameters enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        [originalInvocation getArgument:&obj atIndex:idx + 2];
+        [originalInvocation setArgument:&obj atIndex:idx + 2];
     }];
     
     [originalInvocation invoke];
@@ -419,7 +419,7 @@ static void dy_forwardInvocation_center(id self, SEL _cmd, NSInvocation *anInvoc
     NSLog(@"Fix me here!");
     
     [parameters enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        [originalInvocation getArgument:&obj atIndex:idx + 2];
+        [originalInvocation setArgument:&obj atIndex:idx + 2];
     }];
     
     [originalInvocation invoke];
@@ -473,7 +473,7 @@ static void dy_forwardInvocation_center(id self, SEL _cmd, NSInvocation *anInvoc
     }];
     
     [parameters enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        [originalInvocation getArgument:&obj atIndex:idx + 2];
+        [originalInvocation setArgument:&obj atIndex:idx + 2];
     }];
     
     [originalInvocation invoke];
