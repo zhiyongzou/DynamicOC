@@ -682,16 +682,16 @@ value = (__bridge id)result;
 2. 采用常规方法调用代替 NSInvocation
 
 ```objc
+// 方法1 
+id resultObj = nil;
 NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
 invocation.target = [NSObject class];
 invocation.selector = @selector(new);
 [invocation invoke];
 
-id resultObj = nil,
 void *result;
 [invocation getReturnValue:&result];
 
-// 方法1    
 if ([selName isEqualToString:@"alloc"] ||
     [selName isEqualToString:@"new"] ||
     [selName isEqualToString:@"copy"] ||
@@ -702,18 +702,25 @@ if ([selName isEqualToString:@"alloc"] ||
 }
 
 // 方法2
+id resultObj = nil;
 if ([selName isEqualToString:@"alloc"]) {
     resultObj = [[target class] alloc];
 } else if ([selName isEqualToString:@"new"]) {
-	resultObj = [[target class] new];
+    resultObj = [[target class] new];
 } else if ([selName isEqualToString:@"copy"]) {
-	resultObj = [target copy];
+    resultObj = [target copy];
 } else if ([selName isEqualToString:@"mutableCopy"]) {
-	resultObj = [target mutableCopy];
+    resultObj = [target mutableCopy];
 } else {
+    NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
+    invocation.target = [NSObject class];
+    invocation.selector = @selector(new);
+    [invocation invoke];
+
+    void *result;
+    [invocation getReturnValue:&result];
     resultObj = (__bridge id)result;
 }
-
 ```
 
 ## App 审核分析
