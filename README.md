@@ -679,7 +679,6 @@ value = (__bridge id)result;
 **解决办法：** 
 
 1. 使用`__bridge_transfer`修饰符将返回对象的内存管理权移交出来，让外部对象管理其内存
-2. 采用常规方法调用代替 NSInvocation
 
 ```objc
 // 方法1 
@@ -701,6 +700,11 @@ if ([selName isEqualToString:@"alloc"] ||
     resultObj = (__bridge id)result;
 }
 
+```
+
+2. 采用常规方法调用代替 NSInvocation
+
+```objc
 // 方法2
 id resultObj = nil;
 if ([selName isEqualToString:@"alloc"]) {
