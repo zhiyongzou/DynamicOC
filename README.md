@@ -437,7 +437,7 @@ static void dy_forwardInvocation_center(id self, SEL _cmd, NSInvocation *anInvoc
 ```objc
 - (void)customMethod
 {
-    NSLog(@"%s", __func__);
+    NSLog(@"Dynamic call custom method");
 }
 
 [self dy_hookMethodWithHookMap:@{
@@ -447,7 +447,7 @@ static void dy_forwardInvocation_center(id self, SEL _cmd, NSInvocation *anInvoc
                                      @"customMethods": @[@"self.customMethod"]
                                 }];
                                 
-// 这边会先打印 Dynamic call custom method，然后再打印 CustomName
+// 会先打印 Dynamic call custom method，然后再打印 CustomName
 [NSLog(@"%@", [[MyClassC new] className]);
 
  [cls dy_hookSelector:sel withBlock:^(id  _Nonnull self, NSInvocation * _Nonnull originalInvocation) {
