@@ -1,3 +1,6 @@
+![visitors](https://visitor-badge.laobi.icu/badge?page_id=zhiyongzou.dynamic.oc)
+![Objective-C](https://img.shields.io/badge/language-Objective--C-orange.svg)
+
 # 深入理解 iOS 热修复原理
 
 
