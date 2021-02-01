@@ -242,8 +242,6 @@ invocation.selector = sel_registerName("helloWorld");
 
 第五种 **`NSInvocation 调用`** 是热修复调用任意OC方法的核心基础。通过 NSInvocation 不但可以自定义函数的参数值和返回值，而且还可以自定义方法：`selector` 和消息接收对象：`target`。因此，我们可以通过字符串的方式构建任意OC方法调用。
 
-<!--more-->
-
 
 ## 实战
 掌握了理论知识后，实践起来就不难了。上面说到热修复的核心就是拦截目标方法调用并且拿到方法的参数值，要实现这一点其实很容易。具体步骤如下：
@@ -540,7 +538,7 @@ class_replaceMethod(klass, selector, aspect_getMsgForwardIMP(self, selector), ty
 
 #### 三、Aspects 优化
 * 使用了自旋锁，存在优先级反转问题，使用 `pthread_mutex_lock` 代替即可
-* 特殊 `struct` 判断逻辑不够全面，例如：NSRange, NSPoint等 在 32 位架构下有问题，需要自行兼容
+* 特殊 `struct` 判断逻辑不够全面，例如：NSRange, NSPoint等 在 ~~32~~ x86-64 位架构下有问题，需要自行兼容
 
 ```objc
 #if defined(__LP64__) && __LP64__
