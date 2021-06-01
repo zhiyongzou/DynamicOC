@@ -438,7 +438,7 @@ static void dy_forwardInvocation_center(id self, SEL _cmd, NSInvocation *anInvoc
 [NSLog(@"%@", [[MyClassC new] className]);
 
 [cls dy_hookSelector:sel withBlock:^(id  _Nonnull self, NSInvocation * _Nonnull originalInvocation) {
-	 if ([hookMap[@"isReplcedEmpty"] boolValue]) {
+    if ([hookMap[@"isReplcedEmpty"] boolValue]) {
         NSLog(@"[%@ %@] replace into empty IMP", cls, NSStringFromSelector(sel));
         return;
     }
@@ -644,10 +644,10 @@ id value = nil;
 
 ```objc
 void objc_storeStrong(id *object, id value) {
-	id oldValue = *object;
-	value = [value retain];
-	*object = value;
-	[oldValue release];
+    id oldValue = *object;
+    value = [value retain];
+    *object = value;
+    [oldValue release];
 }
 ```
 
