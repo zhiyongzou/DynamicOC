@@ -189,7 +189,7 @@ void sayHello(id self, SEL _cmd)
 
 其中最后的`forwardInvocation:`会传递一个`NSInvocation`对象（**Ps：NSInvocation 可以理解为是消息发送`objc_msgSend(void id self, SEL op, ...  )`的对象**）。NSInvocation 包含了这个方法调用的所有信息：selector、参数类型、参数值和返回值类型。此外，你还可以去更改参数值和返回值。
 
-**[除了上面的正常消息转发，我们还可以借助`_objc_msgForward`方法让消息强制转发]()**
+**除了上面的正常消息转发，我们还可以借助`_objc_msgForward`方法让消息强制转发**
 
 ```objc
 Method methodA = class_getInstanceMethod(self.class, @selector(myMethodA));
@@ -773,7 +773,7 @@ if ([selName isEqualToString:@"alloc"]) {
 
 取名深入只是为了引人注目，实则只是个人的一点心得。由于水平有限，如有不对之处，欢迎大家批评指正。
 
-**[如果觉得文章不错的话，欢迎🌟以资鼓励😄]()**
+**如果觉得文章不错的话，欢迎🌟以资鼓励😄**
 
 **温馨提示：**
 
