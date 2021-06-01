@@ -10,6 +10,19 @@
 
 @interface ViewController : UIViewController
 
+void sayHello(id self, SEL _cmd);
+
+- (void)myMethodA;
+
+- (void)myMethodB;
+
+- (void)myMethodC;
+
+- (void)myMethodD;
+
+- (void)myEmptyMethod;
+
+- (void)dy_hookMethodWithHookMap:(NSDictionary *)hookMap;
 
 @end
 

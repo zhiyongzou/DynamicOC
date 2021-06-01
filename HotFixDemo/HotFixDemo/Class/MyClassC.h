@@ -16,7 +16,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)className;
 
-- (void)customMethod;
+- (void)myMethod;
+
+- (void)dynamicCallMethod;
 
 @end
 

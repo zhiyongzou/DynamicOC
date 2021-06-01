@@ -12,7 +12,7 @@
 
 - (void)commonMethod
 {
-    
+    NSLog(@"%s", __func__);
 }
 
 + (BOOL)resolveClassMethod:(SEL)sel
@@ -56,6 +56,8 @@
 - (void)forwardInvocation:(NSInvocation *)anInvocation
 {
     NSLog(@"%s %@", __func__, anInvocation);
+    anInvocation.selector = @selector(commonMethod);
+    [anInvocation invoke];
 }
 
 @end

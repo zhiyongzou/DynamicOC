@@ -22,6 +22,9 @@
 		816019AA2498F16C0014AC2D /* MyClassB.m in Sources */ = {isa = PBXBuildFile; fileRef = 816019A92498F16C0014AC2D /* MyClassB.m */; };
 		816019AD2499BED20014AC2D /* OCDynamic.m in Sources */ = {isa = PBXBuildFile; fileRef = 816019AC2499BED20014AC2D /* OCDynamic.m */; };
 		816019B02499D3DD0014AC2D /* MyClassC.m in Sources */ = {isa = PBXBuildFile; fileRef = 816019AF2499D3DD0014AC2D /* MyClassC.m */; };
+		8171550C26665F6200D26E6B /* VCCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 8171550926665F6200D26E6B /* VCCell.m */; };
+		8171550D26665F6200D26E6B /* VCModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8171550B26665F6200D26E6B /* VCModel.m */; };
+		8171551326665F6800D26E6B /* ViewController+DataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 8171551126665F6800D26E6B /* ViewController+DataSource.m */; };
 		D04F2599717BF025564ED16F /* libPods-HotFixDemo-HotFixDemoUITests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A92D959134503905C69A1509 /* libPods-HotFixDemo-HotFixDemoUITests.a */; };
 /* End PBXBuildFile section */
 
@@ -73,6 +76,12 @@
 		816019AC2499BED20014AC2D /* OCDynamic.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OCDynamic.m; sourceTree = "<group>"; };
 		816019AE2499D3DD0014AC2D /* MyClassC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MyClassC.h; sourceTree = "<group>"; };
 		816019AF2499D3DD0014AC2D /* MyClassC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MyClassC.m; sourceTree = "<group>"; };
+		8171550826665F6200D26E6B /* VCModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VCModel.h; sourceTree = "<group>"; };
+		8171550926665F6200D26E6B /* VCCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VCCell.m; sourceTree = "<group>"; };
+		8171550A26665F6200D26E6B /* VCCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VCCell.h; sourceTree = "<group>"; };
+		8171550B26665F6200D26E6B /* VCModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VCModel.m; sourceTree = "<group>"; };
+		8171551126665F6800D26E6B /* ViewController+DataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ViewController+DataSource.m"; sourceTree = "<group>"; };
+		8171551226665F6800D26E6B /* ViewController+DataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ViewController+DataSource.h"; sourceTree = "<group>"; };
 		A92D959134503905C69A1509 /* libPods-HotFixDemo-HotFixDemoUITests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HotFixDemo-HotFixDemoUITests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B741A181A9680FADC7B98CC8 /* Pods-HotFixDemo-HotFixDemoUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HotFixDemo-HotFixDemoUITests.debug.xcconfig"; path = "Target Support Files/Pods-HotFixDemo-HotFixDemoUITests/Pods-HotFixDemo-HotFixDemoUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		B7DF08297ABB588ABD5D2440 /* libPods-HotFixDemo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HotFixDemo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -156,10 +165,16 @@
 		814D5D5A2491E320006A0DA1 /* HotFixDemo */ = {
 			isa = PBXGroup;
 			children = (
-				816019A424979E310014AC2D /* Class */,
 				814D5D912491E381006A0DA1 /* App */,
+				816019A424979E310014AC2D /* Class */,
+				8171550A26665F6200D26E6B /* VCCell.h */,
+				8171550926665F6200D26E6B /* VCCell.m */,
+				8171550826665F6200D26E6B /* VCModel.h */,
+				8171550B26665F6200D26E6B /* VCModel.m */,
 				814D5D612491E320006A0DA1 /* ViewController.h */,
 				814D5D622491E320006A0DA1 /* ViewController.m */,
+				8171551226665F6800D26E6B /* ViewController+DataSource.h */,
+				8171551126665F6800D26E6B /* ViewController+DataSource.m */,
 				814D5D642491E320006A0DA1 /* Main.storyboard */,
 				814D5D672491E321006A0DA1 /* Assets.xcassets */,
 				814D5D692491E321006A0DA1 /* LaunchScreen.storyboard */,
@@ -419,8 +434,11 @@
 				814D5D5D2491E320006A0DA1 /* AppDelegate.m in Sources */,
 				814D5D6E2491E321006A0DA1 /* main.m in Sources */,
 				816019AA2498F16C0014AC2D /* MyClassB.m in Sources */,
+				8171550D26665F6200D26E6B /* VCModel.m in Sources */,
 				816019B02499D3DD0014AC2D /* MyClassC.m in Sources */,
+				8171550C26665F6200D26E6B /* VCCell.m in Sources */,
 				816019AD2499BED20014AC2D /* OCDynamic.m in Sources */,
+				8171551326665F6800D26E6B /* ViewController+DataSource.m in Sources */,
 				814D5D602491E320006A0DA1 /* SceneDelegate.m in Sources */,
 				816019A724979E420014AC2D /* MyClassA.m in Sources */,
 			);
@@ -527,7 +545,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -579,7 +597,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -594,6 +612,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = HotFixDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -611,6 +630,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = HotFixDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

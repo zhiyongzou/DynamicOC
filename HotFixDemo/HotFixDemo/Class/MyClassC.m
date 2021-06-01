@@ -20,9 +20,13 @@
     return @"MyClassC";
 }
 
-- (void)customMethod
+- (void)myMethod
 {
-    NSLog(@"Dynamic call custom method");
+    NSLog(@"%s", __func__);
+}
+
+- (void)dynamicCallMethod {
+    NSLog(@"%s Dynamic call", __func__);
 }
 
 @end

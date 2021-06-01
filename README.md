@@ -5,10 +5,10 @@
 
 
 ## 背景
-顾名思义热修复就是使App具备线上修复`bug`的能力，但是遗憾的是苹果出于安全的考虑禁用了热修复。虽然 App 审核加快了，但是依然无法很好的控制线上`bug`的影响范围。由于 JSPatch 存在审核风险，所以我们需要另辟蹊径，自研一套适合自己的热修复框架。
+顾名思义热修复就是使 App 具备线上修复 bug 的能力，但是遗憾的是苹果出于安全的考虑禁用了热修复。虽然 App 审核加快了，但是依然无法很好的控制线上 bug 的影响范围。由于 JSPatch 存在审核风险，所以我们需要另辟蹊径，自研一套适合自己的热修复框架。
 
 ## 目标
-大部分线上`bug`并不需要完全替换原方法实现才能修复问题，我们可以在原来的方法实现前后增加一些自定的方法调用，或者是修改原方法的调用参数，或者是修改其内部的某一个方法调用即可修复问题。
+大部分线上 bug 并不需要完全替换原方法实现才能修复问题，我们可以在原来的方法实现前后增加一些自定的方法调用，或者是修改原方法的调用参数，或者是修改其内部的某一个方法调用即可修复问题。
 
 ```objc
 - (void)sayHelloTo:(NSString *)name
@@ -189,7 +189,7 @@ void sayHello(id self, SEL _cmd)
 
 其中最后的`forwardInvocation:`会传递一个`NSInvocation`对象（**Ps：NSInvocation 可以理解为是消息发送`objc_msgSend(void id self, SEL op, ...  )`的对象**）。NSInvocation 包含了这个方法调用的所有信息：selector、参数类型、参数值和返回值类型。此外，你还可以去更改参数值和返回值。
 
-**除了上面的正常消息转发，我们还可以借助`_objc_msgForward`方法让消息强制转发。**
+**<font color=6378fd size=3>除了上面的正常消息转发，我们还可以借助`_objc_msgForward`方法让消息强制转发</font>**
 
 ```objc
 Method methodA = class_getInstanceMethod(self.class, @selector(myMethodA));
@@ -240,11 +240,11 @@ invocation.selector = sel_registerName("helloWorld");
 [invocation invoke];
 ```
 
-第五种 **`NSInvocation 调用`** 是热修复调用任意OC方法的核心基础。通过 NSInvocation 不但可以自定义函数的参数值和返回值，而且还可以自定义方法：`selector` 和消息接收对象：`target`。因此，我们可以通过字符串的方式构建任意OC方法调用。
+第五种 **NSInvocation 调用** 是热修复调用任意 OC 方法的核心基础。通过 NSInvocation 不但可以自定义函数的参数值和返回值，而且还可以自定义方法选择器（selector） 和消息接收对象（target）。因此，我们可以通过字符串的方式构建任意 OC 方法调用。
 
 
 ## 实战
-掌握了理论知识后，实践起来就不难了。上面说到热修复的核心就是拦截目标方法调用并且拿到方法的参数值，要实现这一点其实很容易。具体步骤如下：
+掌握了理论知识后，实践起来就不难了。上面说到热修复的核心就是**拦截目标方法调用**并且拿到**方法的参数值**，要实现这一点其实很容易。具体步骤如下：
 
 1. 首先新增一个方法实现跟目标方法一致的别名方法，用来调用原目标方法。
 2. 其次将目标方法的函数实现（IMP）替换成 `_objc_msgForward`，目的是让目标方法进行强制转发
@@ -252,7 +252,7 @@ invocation.selector = sel_registerName("helloWorld");
 
 下面是热修复核心代码的简要实现。
 
-> 注意：实战部分给出的示例代码不考虑异常等情况，只为说明热修复原理
+> 实战部分给出的示例代码不考虑异常等情况，只为阐明热修复原理
 
 ```objc
 typedef void(^OCDynamicBlock)(id self, NSInvocation *originalInvocation);
@@ -340,7 +340,7 @@ static void dy_forwardInvocation_center(id self, SEL _cmd, NSInvocation *anInvoc
 
 虽然调用了 `[[MyClassC new] sayHelloTo:@"jack"];`，但是你会发现并没有对应的`sayHelloTo: jack`日志输出，而是输出了：`oc_dynamic_sayHelloTo: jack`。这说明了该方法调用被成功拦截并且回调到了对应的 block 中。至此，我们简要的热修复功能已实现了。是不是很简单？
 
-上面的示例代码都是本地 Hard Code，下面就来聊聊如何动态的 hook 指定类的方法及改变修改目标方法的调用行为。从 MyClassC 的测试代码中可以看出，我们可以用字符串反射的方式实现动态 Hook。
+上面的示例代码都是本地 Hard Code，下面就来聊聊如何动态的 Hook 指定类的方法及改变修改目标方法的调用行为。从 MyClassC 的测试代码中可以看出，我们可以用字符串反射的方式实现动态 Hook。
 
 ```objc
 [self dy_hookMethodWithHookMap:@{
@@ -369,26 +369,47 @@ static void dy_forwardInvocation_center(id self, SEL _cmd, NSInvocation *anInvoc
 替换为空实现其实很简单，就是不处理回调中的 `originalInvocation` 即可。
 
 ```objc
+[weakSelf dy_hookMethodWithHookMap:@{
+    @"cls": @"ViewController",
+    @"sel": @"myEmptyMethod",
+    @"isReplcedEmpty": @(YES)
+}];
+
+// 将不会打印 -[ViewController myEmptyMethod]
+[weakSelf myEmptyMethod];
+
 [cls dy_hookSelector:sel withBlock:^(id  _Nonnull self, NSInvocation * _Nonnull originalInvocation) {
-    
+	
+   if ([hookMap[@"isReplcedEmpty"] boolValue]) {
+        NSLog(@"[%@ %@] replace into empty IMP", cls, NSStringFromSelector(sel));
+        return;
+   }
 }];
 ```
 
 ### 二、方法参数修改
-通过 NSInvocation 的 `- (void)setArgument:(void *)argumentLocation atIndex:(NSInteger)idx`即可修改方法参数值。例如动态的把 `sayHelloTo:` 方法的参数值`jack` 改为 `Lili`。（**知识点：所有OC方法都有两个隐藏的参数：第一个是`self`, 第二个是`selector`，所以我们在设置参数值时 index 是从 2 开始的**）
+通过 NSInvocation 的 `- (void)setArgument:(void *)argumentLocation atIndex:(NSInteger)idx`即可修改方法参数值。例如动态的把 `sayHelloTo:` 方法的参数值`jack` 改为 `Lili`。
+
+**知识点：**
+
+> 所有 OC 方法都有两个隐藏的参数：第一个是`self`, 第二个是`selector`，所以我们在设置参数值时 index 是从 2 开始的
 
 ```objc
-[self dy_hookMethodWithHookMap:@{
-                                     @"cls": @"MyClassC",
-                                     @"sel": @"sayHelloTo:",
-                                     @"parameters": @[@"Lili"]
-                                }];
+[weakSelf dy_hookMethodWithHookMap:@{
+     @"cls": @"MyClassC",
+     @"sel": @"sayHelloTo:",
+     @"parameters": @[@"Lili"]
+}];
                                 
 // 打印信息是-[MyClassC sayHelloTo:]: Lili ，而不是 jack
 [[MyClassC new] sayHelloTo:@"jack"];
 
- [cls dy_hookSelector:sel withBlock:^(id  _Nonnull self, NSInvocation * _Nonnull originalInvocation) {
-    NSLog(@"Fix me here!");
+[cls dy_hookSelector:sel withBlock:^(id  _Nonnull self, NSInvocation * _Nonnull originalInvocation) {
+    
+    if ([hookMap[@"isReplcedEmpty"] boolValue]) {
+        NSLog(@"[%@ %@] replace into empty IMP", cls, NSStringFromSelector(sel));
+        return;
+    }
     
     [parameters enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [originalInvocation setArgument:&obj atIndex:idx + 2];
@@ -402,23 +423,25 @@ static void dy_forwardInvocation_center(id self, SEL _cmd, NSInvocation *anInvoc
 通过 NSInvocation 的 `- (void)setReturnValue:(void *)retLoc`即可修改方法返回值。例如将 `MyClassC` 的 `className` 方法的返回值改为 `CustomName`
 
 ```objc
-- (NSString *)className
-{
+- (NSString *)className {
     return @"MyClassC";
 }
 
-[self dy_hookMethodWithHookMap:@{
-                                     @"cls": @"MyClassC",
-                                     @"sel": @"className",
-                                     @"returnValue": @"CustomName"
-                                }];
+[weakSelf dy_hookMethodWithHookMap:@{
+     @"cls": @"MyClassC",
+     @"sel": @"className",
+     @"returnValue": @"CustomName"
+}];
                                 
-// 打印信息是 CustomName ，而不是 MyClassC
+// 打印信息是 Return value had change ，而不是 MyClassC
 [NSLog(@"%@", [[MyClassC new] className]);
 
- [cls dy_hookSelector:sel withBlock:^(id  _Nonnull self, NSInvocation * _Nonnull originalInvocation) {
-    NSLog(@"Fix me here!");
-    
+[cls dy_hookSelector:sel withBlock:^(id  _Nonnull self, NSInvocation * _Nonnull originalInvocation) {
+	 if ([hookMap[@"isReplcedEmpty"] boolValue]) {
+        NSLog(@"[%@ %@] replace into empty IMP", cls, NSStringFromSelector(sel));
+        return;
+    }
+
     [parameters enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [originalInvocation setArgument:&obj atIndex:idx + 2];
     }];
@@ -427,32 +450,34 @@ static void dy_forwardInvocation_center(id self, SEL _cmd, NSInvocation *anInvoc
     
     id returnValue = [hookMap objectForKey:@"returnValue"];
     if (returnValue) {
-	[originalInvocation setReturnValue:&returnValue];
+		[originalInvocation setReturnValue:&returnValue];
     }
 }];
 ```
 
 ### 四、方法调用前后插入自定义代码
-我们可以在回调 block 中做一些自定义调用，等这些完成后再调用`[originalInvocation invoke]` 。例如在 `className` 调用前调用 `customMethod`方法
+我们可以在回调 block 中做一些自定义调用，等这些完成后再调用`[originalInvocation invoke]` 。例如在 `myMethod ` 调用前调用 `dynamicCallMethod `方法
 
 ```objc
-- (void)customMethod
-{
-    NSLog(@"Dynamic call custom method");
+- (void)dynamicCallMethod {
+    NSLog(@"%s Dynamic call", __func__);
 }
 
-[self dy_hookMethodWithHookMap:@{
-                                     @"cls": @"MyClassC",
-                                     @"sel": @"className",
-                                     @"returnValue": @"CustomName",
-                                     @"customMethods": @[@"self.customMethod"]
-                                }];
+[weakSelf dy_hookMethodWithHookMap:@{
+    @"cls": @"MyClassC",
+    @"sel": @"myMethod",
+    @"customMethods": @[@"self.dynamicCallMethod"]
+ }];
                                 
-// 会先打印 Dynamic call custom method，然后再打印 CustomName
-[NSLog(@"%@", [[MyClassC new] className]);
+// 会先打印 -[MyClassC dynamicCallMethod] Dynamic call，然后再打印 -[MyClassC myMethod]
+[[MyClassC new] myMethod];
 
- [cls dy_hookSelector:sel withBlock:^(id  _Nonnull self, NSInvocation * _Nonnull originalInvocation) {
-    NSLog(@"Fix me here!");
+[cls dy_hookSelector:sel withBlock:^(id  _Nonnull self, NSInvocation * _Nonnull originalInvocation) {
+    
+    if ([hookMap[@"isReplcedEmpty"] boolValue]) {
+        NSLog(@"[%@ %@] replace into empty IMP", cls, NSStringFromSelector(sel));
+        return;
+    }
     
     [customMethods enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         NSArray<NSString *> *targets = [obj componentsSeparatedByString:@"."];
@@ -481,19 +506,15 @@ static void dy_forwardInvocation_center(id self, SEL _cmd, NSInvocation *anInvoc
     
     id returnValue = [hookMap objectForKey:@"returnValue"];
     if (returnValue) {
-	[originalInvocation setReturnValue:&returnValue];
+		[originalInvocation setReturnValue:&returnValue];
     }
 }];
 
 ```
 
-上面简单的阐述了如何通过字符串方式调用OC方法，如果要实现可以调用任意OC方法，还需要继续完善上面的解析逻辑，但其中核心点都是通过构建 `NSInvocation`。这里算是抛砖引玉吧。
+上面简单的阐述了如何通过字符串方式调用 OC 方法，如果要实现可以调用任意 OC 方法，还需要继续完善上面的解析逻辑，但其中核心点都是通过构建 `NSInvocation`。这里算是抛砖引玉吧。
 
-> Tip：很多时候可能需要调用多个方法，并且有些方法的返回值是后面的方法的参数值。例如：`self.backgroundColor = [UIColor redColor];`，这就需要我们现提前创建好 `redColor`局部变量，并且使用 key-value 方式保存下来。这样我们就可以在回调 block 中通过对应 key 获取到`redColor`。
-
-`OCDynamic`只是简单的实现了热修复的核心逻辑，这是远远不够的。虽然我们可以不断完善，但是业界已经有了完善的开源库：[Aspects](https://github.com/steipete/Aspects)。`Aspects`库是`OCDynamic`的加强完善版。因此，我们只需要站在巨人的肩膀上即可，就没有必要重复造轮子了。下面就来分析下`Aspects`的基本原理及其可以优化的点。
-
-> 这边介绍一个更强大的库，外部函数接口：[libffi](https://github.com/libffi/libffi)，它也可以拦截函数和获取函数调用参数。相比 Aspects，其功能更加强大。它是C / OC通吃。有兴趣的童鞋请参考：[libffi doc](https://sourceware.org/libffi/) 和 [如何动态调用 C 函数](http://blog.cnbang.net/tech/3219/)
+OCDynamic 只是简单的实现了热修复的核心逻辑，这是远远不够的。虽然我们可以不断完善，但是业界已经有了完善的开源库：[Aspects](https://github.com/steipete/Aspects)。`Aspects`库是`OCDynamic`的加强完善版。因此，我们只需要站在巨人的肩膀上即可，就没有必要重复造轮子了。下面就来分析下`Aspects`的基本原理及其可以优化的点。
 
 ## [Aspects](https://github.com/steipete/Aspects) 
 Aspects 可以拦截目标方法调用，并且将目标方法调用以 NSInvocation 形式返回。 下面简单介绍下其主要构成、Hook 流程、Invoke 流程及该库存在的一些问题。
@@ -505,18 +526,18 @@ Aspects 可以拦截目标方法调用，并且将目标方法调用以 NSInvoca
 1. 检查 selector 是否可以替换，里面涉及一些黑名单等判断
 2. 获取 AspectsContainer，如果为空则创建并绑定目标类
 3. 创建 AspectIdentifier，用来保存回调`block`和 `AspectOptions` 等信息
-4. 将目标类 `forwardInvocation:` 方法替换为自定义方法
+4. 将目标类 `forwardInvocation:` 方法替换为自定义方法（\_\_ASPECTS\_ARE\_BEING\_CALLED\_\_）
 5. 目标类新增一个带有` aspects_`前缀的方法，新方法（aliasSelector）实现跟目标方法相同
 6. 将目标方法实现替换为 `_objc_msgForward`
 
 ```objc
-// 将目标类 **forwardInvocation:** 方法替换为自定义方法
+// 将目标类 forwardInvocation: 方法替换为自定义方法
 IMP originalImplementation = class_replaceMethod(klass, @selector(forwardInvocation:), (IMP)__ASPECTS_ARE_BEING_CALLED__, "v@:@");
 if (originalImplementation) {
     class_addMethod(klass, NSSelectorFromString(AspectsForwardInvocationSelectorName), originalImplementation, "v@:@");
 }
 
-// 目标类新增一个带有` aspects_`前缀的方法，新方法（aliasSelector）实现跟目标方法相同
+// 目标类新增一个带有 aspects_ 前缀的方法，新方法（aliasSelector）实现跟目标方法相同
 Method targetMethod = class_getInstanceMethod(klass, selector);
 IMP targetMethodIMP = method_getImplementation(targetMethod);
 
@@ -524,7 +545,7 @@ const char *typeEncoding = method_getTypeEncoding(targetMethod);
 SEL aliasSelector = NSSelectorFromString([AspectsMessagePrefix stringByAppendingFormat:@"_%@", NSStringFromSelector(selector)]);
 class_addMethod(klass, aliasSelector, method_getImplementation(targetMethod), typeEncoding);
 
-// 将目标方法实现替换为 `_objc_msgForward`
+// 将目标方法实现替换为 _objc_msgForward
 class_replaceMethod(klass, selector, aspect_getMsgForwardIMP(self, selector), typeEncoding);
 
 ```
@@ -538,7 +559,7 @@ class_replaceMethod(klass, selector, aspect_getMsgForwardIMP(self, selector), ty
 
 #### 三、Aspects 优化
 * 使用了自旋锁，存在优先级反转问题，使用 `pthread_mutex_lock` 代替即可
-* 特殊 `struct` 判断逻辑不够全面，例如：NSRange, NSPoint等 在 ~~32~~ x86-64 位架构下有问题，需要自行兼容
+* 特殊 `struct` 判断逻辑不够全面，例如 NSRange, NSPoint 等在 x86-64 位架构下有问题，需要自行兼容
 
 ```objc
 #if defined(__LP64__) && __LP64__
@@ -669,13 +690,18 @@ value = (__bridge id)result;
 
 ```
 
-使用`Memory Graph`查看对象内存时会发现 `MyClassA` 和 `MyClassB` 都被标记为内存泄漏了⚠️
+使用 **Memory Graph** 查看对象内存时会发现 `MyClassA` 和 `MyClassB` 都被标记为内存泄漏了
 
 **原因分析：**
 
-1. ARC 机制中，当调用 `alloc/new/copy/mutableCopy` 方法返回的对象是直接持有的。其引用计数为`1`，并且不会自动调用 `autorelease`
-2. 常规的方法返回值 ARC 会在 return 后自动调用 `autorelease`，所以不会发生内存泄漏
-3. 使用`NSInvocation`或`performSelector:`调用`alloc/new/copy/mutableCopy`方法时，ARC 并不会自动调用`release`，所以导致内存泄漏
+ARC 机制中，当调用 `alloc/new/copy/mutableCopy` 方法返回的对象是直接持有的，其引用计数为`1`。在常规的方法调用时编译器会自动调用 release，而使用`NSInvocation`或`performSelector:`动态调用`alloc/new/copy/mutableCopy`方法时，ARC 并不会自动调用`release`，所以导致内存泄漏。
+
+**谨记：**
+
+> ARC 对动态方法调用是无能为力的😅 
+
+**温馨提示：**
+> 有兴趣的可以 Xcode 看看这两种方式的汇编实现🤔 （Product -> Perform Action -> Assemble）
 
 **解决办法：** 
 
@@ -728,22 +754,29 @@ if ([selName isEqualToString:@"alloc"]) {
 }
 ```
 
-## App 审核分析
+## 审核分析
 其实能不能成功上线是热修复的首要前提，我们辛辛苦苦开的框架如果上不了线，那一切都是徒劳无功。下面就来分析下其审核风险。
 
-- 首先这个是我们自研的，所以苹果审核无法通过静态代码识别，这一点是没有问题的。
-- 其次系统库内部也大量使用了消息转发机制。这一点可以通过符号断点验证`_objc_msgForward`和`forwardInvocation:`。所以不存在风险。此外，你还可以通过一些字符串拼接和base64编码方式进行混淆，这样就更加安全了。
-- 除非苹果采用动态检验消息转发，非系统调用都不能使用，但这个成本太大了，几乎不可能。
-- Aspects 库目前线上有大量使用，为此不用担心。就算 Aspects 被禁用，参考 Aspects 自己开发也不难。
+- 首先这个是我们自研的，所以苹果审核无法通过静态代码扫描识别。
+- 其次系统库内部也大量使用了消息转发机制。可以通过符号断点验证`_objc_msgForward`和`forwardInvocation:`。所以不存在风险。
+- 苹果无法采用动态检验消息转发，非系统调用都不能使用，这个成本太大了，几乎不可能。
+- Aspects 库目前线上有大量使用，为此不用担心。就算 Aspects 被禁用，参考 Aspects 自己实现也不难。
 
-综上所述：超低审核风险。
+综上所述：无审核风险。
 
-热修复框架只是为了更好的控制线上bug影响范围和给用户更好的体验。建议：只为 bug 而生！！！
+当然热修复框架只是为了更好的控制线上 bug 影响范围和给用户更好的体验。不建议基于其它目的使用🤔
 
 ## 后记
+随着项目的业务复杂度增加，线上问题可能存在一些 C 函数的动态调用和 block 参数的修改，这边介绍一个强大的库，外部函数接口：[libffi](https://github.com/libffi/libffi)，它也可以拦截函数和获取函数调用参数。相比 Aspects，其功能更加强大，不但可以动态调用 C 函数，而且还可以用 libffi 实现一套基于 IMP 替换（拥有更好的性能）的热修复框架。有兴趣的童鞋请参考：[libffi doc](https://sourceware.org/libffi/) 和 [如何动态调用 C 函数](http://blog.cnbang.net/tech/3219/) 
+
 取名深入只是为了引人注目，实则只是个人的一点心得。由于水平有限，如有不对之处，欢迎大家批评指正。
 
-> QQ 交流群:`310936767`
+**<font color=6378fd>如果觉得文章不错的话，欢迎🌟以资鼓励😄</font>**
+
+**温馨提示：**
+
+> 阅读文章的时候建议搭配示例 HotFixDemo，这样理解会更加深刻。
+
 
 ## 参考文献
 1. [Objective-C Runtime Programming Guide](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Introduction/Introduction.html)
