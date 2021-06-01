@@ -193,11 +193,10 @@ void sayHello(id self, SEL _cmd)
 
 ```objc
 Method methodA = class_getInstanceMethod(self.class, @selector(myMethodA));
-IMP impA = method_getImplementation(methodA);
 IMP msgForwardIMP = _objc_msgForward;
 
 // 替换 myMethodA 的实现后，每次调用 myMethodA 都会进入消息转发
-class_replaceMethod(self.class, @selector(myMethodC), msgForwardIMP, method_getTypeEncoding(methodA));
+class_replaceMethod(self.class, @selector(myMethodA), msgForwardIMP, method_getTypeEncoding(methodA));
 ```
 
 ### Method 调用方式
